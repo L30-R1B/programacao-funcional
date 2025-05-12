@@ -1,0 +1,103 @@
+=== Teste para o Trabalho Prático de Programação Funcional ===
+
+-- Questão 01: Lista de produtos
+produtos:
+> produtos
+[Produto {nomeProduto = "AGUA MINERAL", valorProduto = 2.5}, Produto {nomeProduto = "CHOCOLATE", valorProduto = 3.99}, ...]
+
+-- Questão 02: Funções auxiliares
+repete 'a' 3:
+> repete 'a' 3
+"aaa"
+
+index "CHOCOLATE" (map nomeProduto produtos):
+> index "CHOCOLATE" (map nomeProduto produtos)
+Just 1
+
+elemento produtos 2:
+> elemento produtos 2
+Just (Produto {nomeProduto = "LEITE", valorProduto = 2.99})
+
+-- Questão 03: Operações com produtos
+addProduto produtos (Produto "BANANA" 1.99):
+> addProduto produtos (Produto "BANANA" 1.99)
+[... , Produto {nomeProduto = "BANANA", valorProduto = 1.99}]
+
+remProduto produtos "LEITE":
+> remProduto produtos "LEITE"
+[Lista sem o produto "LEITE"]
+
+buscaProduto produtos "CAFE":
+> buscaProduto produtos "CAFE"
+Just (Produto {nomeProduto = "CAFE", valorProduto = 5.99})
+
+-- Questão 04: Alinhamento de strings
+alinhaEsq "AGUA MINERAL" '.' 20:
+> alinhaEsq "AGUA MINERAL" '.' 20
+"AGUA MINERAL........"
+
+alinhaDir "CAFE" '.' 20:
+> alinhaDir "CAFE" '.' 20
+"................CAFE"
+
+-- Questão 05: Formatação de valores
+12.5 $$ 2:
+> 12.5 $$ 2
+"12.50"
+
+dinheiro 3647.74299:
+> dinheiro 3647.74299
+"$3647.74"
+
+-- Questão 06: Formatação de itens
+formataItem (Item (Produto "AMENDOIM" 3.99) 5):
+> formataItem (Item (Produto "AMENDOIM" 3.99) 5)
+"AMENDOIM....................... $3.99 x 5 = $19.95"
+
+-- Questão 07: Cálculo do total
+total [(Item (Produto "AGUA MINERAL" 2.5) 2), (Item (Produto "CHOCOLATE" 3.99) 5)]:
+> total [(Item (Produto "AGUA MINERAL" 2.5) 2), (Item (Produto "CHOCOLATE" 3.99) 5)]
+"$24.95"
+
+-- Questão 08: Nota fiscal
+notaFiscal [(Item (Produto "AMENDOIM" 3.99) 5), (Item (Produto "HEINEKEN 5L" 64.99) 10)]:
+> notaFiscal [(Item (Produto "AMENDOIM" 3.99) 5), (Item (Produto "HEINEKEN 5L" 64.99) 10)]
+*******************************
+NOTA FISCAL
+*******************************
+AMENDOIM....................... $3.99 x 5 = $19.95
+HEINEKEN 5L.................... $64.99 x 10 = $649.90
+*******************************
+TOTAL: $669.85
+*******************************
+
+-- Questão 09: Geração de itens
+prodItem:
+> prodItem
+[Item (Produto "AGUA MINERAL" 2.5) 1, Item (Produto "CHOCOLATE" 3.99) 2, ...]
+
+prodItemX [1, 2, 3]:
+> prodItemX [1, 2, 3]
+[Item (Produto "AGUA MINERAL" 2.5) 1, Item (Produto "CHOCOLATE" 3.99) 2, Item (Produto "LEITE" 2.99) 3]
+
+-- Questão 10: Conversão de listas para itens
+itensN [("AGUA MINERAL", 2), ("CHOCOLATE", 5)]:
+> itensN [("AGUA MINERAL", 2), ("CHOCOLATE", 5)]
+[Item (Produto "AGUA MINERAL" 2.5) 2, Item (Produto "CHOCOLATE" 3.99) 5]
+
+itensI [(0, 2), (1, 5)]:
+> itensI [(0, 2), (1, 5)]
+[Item (Produto "AGUA MINERAL" 2.5) 2, Item (Produto "CHOCOLATE" 3.99) 5]
+
+-- Questão 11: Função de venda
+venda (itensI [(1, 2), (2, 5), (4, 10)]):
+> venda (itensI [(1, 2), (2, 5), (4, 10)])
+*******************************
+NOTA FISCAL
+*******************************
+CHOCOLATE...................... $3.99 x 2 = $7.98
+LEITE......................... $2.99 x 5 = $14.95
+ARROZ......................... $10.50 x 10 = $105.00
+*******************************
+TOTAL: $127.93
+*******************************

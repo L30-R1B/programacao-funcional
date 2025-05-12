@@ -1,29 +1,31 @@
-module TrabalhoPratico1 where
+module TrabalhoPratico where
 
 import Data.List (intercalate)
 
--- Question 01
+-- Questão 01: Definição de tipos
 type Nome = String
 type Valor = Float
 type Quantidade = Int
-data Produto = Produto Nome Valor deriving (Show, Eq)
-data Item = Item Produto Quantidade deriving (Show)
 
+data Produto = Produto { nomeProduto :: Nome, valorProduto :: Valor } deriving (Show, Eq)
+data Item = Item { produtoItem :: Produto, quantidadeItem :: Quantidade } deriving (Show)
+
+-- Lista de produtos
 produtos :: [Produto]
 produtos = [
     Produto "AGUA MINERAL" 2.50,
     Produto "CHOCOLATE" 3.99,
     Produto "LEITE" 2.99,
-    Produto "AMENDOIM" 3.99,
-    Produto "HEINEKEN 5L" 64.99,
-    Produto "ARROZ 5KG" 22.50,
-    Produto "FEIJAO 1KG" 8.99,
-    Produto "ACUCAR 1KG" 4.50,
-    Produto "CAFE 500G" 12.99,
-    Produto "SAL 1KG" 2.25
+    Produto "CAFE" 5.99,
+    Produto "ARROZ" 10.50,
+    Produto "FEIJAO" 8.75,
+    Produto "ACUCAR" 4.25,
+    Produto "SAL" 1.99,
+    Produto "OLEO" 7.50,
+    Produto "BISCOITO" 3.25
     ]
 
--- Question 02
+-- Questão 02: Funções auxiliares
 repete :: a -> Int -> [a]
 repete _ 0 = []
 repete x n = x : repete x (n-1)
@@ -32,9 +34,9 @@ index :: Eq a => a -> [a] -> Maybe Int
 index x xs = index' x xs 0
     where
         index' _ [] _ = Nothing
-        index' x (y:ys) n
-            | x == y = Just n
-            | otherwise = index' x ys (n+1)
+        index' y (z:zs) i
+            | y == z = Just i
+            | otherwise = index' y zs (i+1)
 
 elemento :: [a] -> Int -> Maybe a
 elemento [] _ = Nothing
@@ -43,100 +45,79 @@ elemento (_:xs) n
     | n < 0 = Nothing
     | otherwise = elemento xs (n-1)
 
--- Question 03
+-- Questão 03: Operações com produtos
 addProduto :: [Produto] -> Produto -> [Produto]
-addProduto xs p = xs ++ [p]
+addProduto ps p = ps ++ [p]
 
 remProduto :: [Produto] -> Nome -> [Produto]
 remProduto [] _ = []
-remProduto ((Produto nome valor):xs) nomeRem
-    | nome == nomeRem = xs
-    | otherwise = (Produto nome valor) : remProduto xs nomeRem
+remProduto (p:ps) nome
+    | nomeProduto p == nome = ps
+    | otherwise = p : remProduto ps nome
 
 buscaProduto :: [Produto] -> Nome -> Maybe Produto
 buscaProduto [] _ = Nothing
-buscaProduto ((Produto nome valor):xs) nomeBusca
-    | nome == nomeBusca = Just (Produto nome valor)
-    | otherwise = buscaProduto xs nomeBusca
+buscaProduto (p:ps) nome
+    | nomeProduto p == nome = Just p
+    | otherwise = buscaProduto ps nome
 
--- Question 04
+-- Questão 04: Alinhamento de strings
 alinhaEsq :: String -> Char -> Int -> String
-alinhaEsq s c n
-    | length s >= n = s
-    | otherwise = s ++ repeteChar c (n - length s)
-    where repeteChar ch m = take m (repeat ch)
+alinhaEsq str ch n = str ++ replicate (n - length str) ch
 
 alinhaDir :: String -> Char -> Int -> String
-alinhaDir s c n
-    | length s >= n = s
-    | otherwise = repeteChar c (n - length s) ++ s
-    where repeteChar ch m = take m (repeat ch)
+alinhaDir str ch n = replicate (n - length str) ch ++ str
 
--- Question 05
-infixl 5 $$
+-- Questão 05: Formatação de valores monetários
+infix 5 $$
 ($$) :: Valor -> Int -> String
-v $$ n = 
-    let s = show v
-        parts = splitAtDot s
-    in case parts of
-        (intPart, "") -> intPart ++ ".00"
-        (intPart, decPart) -> intPart ++ "." ++ take n (decPart ++ repeat '0')
-    where
-        splitAtDot str = case break (== '.') str of
-            (a, '.':b) -> (a, b)
-            (a, _) -> (a, "")
+val $$ dec =
+    let inteiro = show (truncate val :: Int)
+        parteDecimal = val - fromIntegral (truncate val :: Int)
+        decimalStr = show (round (parteDecimal * 10^dec) :: Int)
+        decimalPadded = replicate (dec - length decimalStr) '0' ++ decimalStr
+    in inteiro ++ "." ++ take dec decimalPadded
 
 dinheiro :: Valor -> String
-dinheiro v = "$" ++ (v $$ 2)
+dinheiro val = "$" ++ (val $$ 2)
 
--- Question 06
+-- Questão 06: Formatação de itens
 formataItem :: Item -> String
 formataItem (Item (Produto nome valor) qtd) =
     let nomeFormatado = alinhaEsq nome '.' 45
-        valorStr = dinheiro valor
-        qtdStr = show qtd
-        subtotal = dinheiro (valor * fromIntegral qtd)
-        linha = nomeFormatado ++ " " ++ valorStr ++ " x " ++ qtdStr ++ " = " ++ subtotal
+        valorFormatado = alinhaDir (dinheiro valor) ' ' 10
+        qtdFormatado = show qtd
+        subtotal = alinhaDir (dinheiro (valor * fromIntegral qtd)) ' ' 10
+        linha = nomeFormatado ++ " " ++ valorFormatado ++ " x " ++ qtdFormatado ++ " = " ++ subtotal
     in take 80 linha
 
--- Question 07
+-- Questão 07: Cálculo do total
 total :: [Item] -> String
-total itens = dinheiro (somaTotal itens)
-    where
-        somaTotal [] = 0
-        somaTotal ((Item (Produto _ valor) qtd):xs) = 
-            valor * fromIntegral qtd + somaTotal xs
+total itens = dinheiro (sum [valorProduto (produtoItem i) * fromIntegral (quantidadeItem i) | i <- itens])
 
--- Question 08
-notafiscal :: [Item] -> String
-notafiscal itens =
-    let header = repeteChar '*' 80
-        title = "NOTA FISCAL"
-        titleLine = alinhaEsq (alinhaDir title ' ' ((80 - length title) `div` 2 + length title)) ' ' 80
-        itemsLines = map formataItem itens
-        totalLine = "TOTAL: " ++ total itens
-        footer = repeteChar '*' 80
-    in intercalate "\n" (header : titleLine : itemsLines ++ [footer, totalLine, footer])
-    where repeteChar ch n = take n (repeat ch)
+-- Questão 08: Nota fiscal
+notaFiscal :: [Item] -> String
+notaFiscal itens =
+    let linhaSeparadora = replicate 80 '*'
+        cabecalho = "NOTA FISCAL"
+        linhasItens = map formataItem itens
+        totalStr = "TOTAL: " ++ total itens
+    in unlines $ [linhaSeparadora, cabecalho, linhaSeparadora] ++ linhasItens ++ [linhaSeparadora, totalStr, linhaSeparadora]
 
--- Question 09
-proditem :: [Item]
-proditem = proditemx [1..length produtos]
+-- Questão 09: Geração de itens
+prodItem :: [Item]
+prodItem = [Item p (i+1) | (p, i) <- zip produtos [0..]]
 
-proditemx :: [Quantidade] -> [Item]
-proditemx qtds = zipWith (\p q -> Item p q) (take (length qtds) produtos) qtds
+prodItemX :: [Quantidade] -> [Item]
+prodItemX qtds = take (length qtds) [Item p q | (p, q) <- zip produtos qtds]
 
--- Question 10
-itensn :: [(Nome, Quantidade)] -> [Item]
-itensn = map (\(nome, qtd) -> case buscaProduto produtos nome of
-    Just p -> Item p qtd
-    Nothing -> error "Produto não encontrado")
+-- Questão 10: Conversão de listas para itens
+itensN :: [(Nome, Quantidade)] -> [Item]
+itensN nqs = [Item p q | (n, q) <- nqs, Just p <- [buscaProduto produtos n]]
 
-itensi :: [(Int, Quantidade)] -> [Item]
-itensi = map (\(idx, qtd) -> case elemento produtos idx of
-    Just p -> Item p qtd
-    Nothing -> error "Índice de produto inválido")
+itensI :: [(Int, Quantidade)] -> [Item]
+itensI iqs = [Item p q | (i, q) <- iqs, Just p <- [elemento produtos i]]
 
--- Question 11
-venda :: [Item] -> IO()
-venda itens = putStrLn (notafiscal itens)
+-- Questão 11: Função de venda
+venda :: [Item] -> IO ()
+venda itens = putStrLn (notaFiscal itens)

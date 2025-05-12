@@ -1,0 +1,132 @@
+=== Testes para produtos ===
+1. produtos !! 0 == Produto "AGUA MINERAL" 2.50
+2. length produtos == 10
+3. nomeProduto (produtos !! 2) == "LEITE"
+4. valorProduto (produtos !! 4) == 10.50
+5. produtos !! 9 == Produto "BISCOITO" 3.25
+
+=== Testes para repete ===
+1. repete 'a' 3 == "aaa"
+2. repete 5 4 == [5,5,5,5]
+3. repete "teste" 2 == ["teste","teste"]
+4. repete True 0 == []
+5. repete (Produto "TESTE" 1.0) 1 == [Produto "TESTE" 1.0]
+
+=== Testes para index ===
+1. index 3 [1,2,3,4] == Just 2
+2. index 'b' "abcde" == Just 1
+3. index "x" ["a","b","c"] == Nothing
+4. index (Produto "LEITE" 2.99) produtos == Just 2
+5. index 10 [1..9] == Nothing
+
+=== Testes para elemento ===
+1. elemento [10,20,30] 1 == Just 20
+2. elemento "Haskell" 6 == Just 'l'
+3. elemento produtos 5 == Just (Produto "FEIJAO" 8.75)
+4. elemento [] 0 == Nothing
+5. elemento [1..5] (-1) == Nothing
+
+=== Testes para addProduto ===
+1. length (addProduto produtos (Produto "NOVO" 1.0)) == 11
+2. addProduto [] (Produto "TESTE" 1.0) == [Produto "TESTE" 1.0]
+3. addProduto [Produto "A" 1.0] (Produto "B" 2.0) == [Produto "A" 1.0, Produto "B" 2.0]
+4. last (addProduto produtos (Produto "ULTIMO" 9.99)) == Produto "ULTIMO" 9.99
+5. addProduto (take 3 produtos) (Produto "EXTRA" 5.0) == [Produto "AGUA MINERAL" 2.50, Produto "CHOCOLATE" 3.99, Produto "LEITE" 2.99, Produto "EXTRA" 5.0]
+
+=== Testes para remProduto ===
+1. length (remProduto produtos "LEITE") == 9
+2. remProduto [] "INEXISTENTE" == []
+3. remProduto [Produto "A" 1.0, Produto "B" 2.0] "A" == [Produto "B" 2.0]
+4. remProduto produtos "INEXISTENTE" == produtos
+5. remProduto (take 3 produtos) "CHOCOLATE" == [Produto "AGUA MINERAL" 2.50, Produto "LEITE" 2.99]
+
+=== Testes para buscaProduto ===
+1. buscaProduto produtos "CAFE" == Just (Produto "CAFE" 5.99)
+2. buscaProduto [] "INEXISTENTE" == Nothing
+3. buscaProduto [Produto "A" 1.0] "A" == Just (Produto "A" 1.0)
+4. buscaProduto produtos "PRODUTO_INEXISTENTE" == Nothing
+5. buscaProduto (take 2 produtos) "LEITE" == Nothing
+
+=== Testes para alinhaEsq ===
+1. alinhaEsq "TESTE" '.' 10 == "TESTE....."
+2. alinhaEsq "" '-' 5 == "-----"
+3. alinhaEsq "LONGO" ' ' 3 == "LONGO"
+4. alinhaEsq "A" '*' 5 == "A****"
+5. alinhaEsq "ALINHAR" '.' 7 == "ALINHAR"
+
+=== Testes para alinhaDir ===
+1. alinhaDir "TESTE" '.' 10 == ".....TESTE"
+2. alinhaDir "" '-' 5 == "-----"
+3. alinhaDir "LONGO" ' ' 3 == "LONGO"
+4. alinhaDir "A" '*' 5 == "****A"
+5. alinhaDir "ALINHAR" '.' 7 == "ALINHAR"
+
+=== Testes para $$ ===
+1. 12.5 $$ 2 == "12.50"
+2. 155.982401 $$ 3 == "155.982"
+3. 0.99 $$ 2 == "0.99"
+4. 7 $$ 4 == "7.0000"
+5. 1234.56789 $$ 0 == "1234."
+
+=== Testes para dinheiro ===
+1. dinheiro 3647.74299 == "$3647.74"
+2. dinheiro 0.5 == "$0.50"
+3. dinheiro 100 == "$100.00"
+4. dinheiro (-45.67) == "$-45.67"
+5. dinheiro 999.999 == "$1000.00"
+
+=== Testes para formataItem ===
+1. formataItem (Item (Produto "AMENDOIM" 3.99) 5) == "AMENDOIM...... $3.99 x 5 =   $19.95"
+2. formataItem (Item (Produto "A" 1.0) 1) == "A........................................ $1.00 x 1 =    $1.00"
+3. formataItem (Item (Produto "NOME LONGO" 123.45) 10) == "NOME LONGO...... $123.45 x 10 =   $1234.50"
+4. formataItem (Item (Produto "TESTE" 0.99) 100) == "TESTE...... $0.99 x 100 =   $99.00"
+5. formataItem (Item (Produto "X" 9.99) 0) == "X........................................ $9.99 x 0 =    $0.00"
+
+=== Testes para total ===
+1. total [Item (Produto "A" 1.0) 1] == "$1.00"
+2. total [Item (Produto "B" 2.0) 3, Item (Produto "C" 1.5) 2] == "$9.00"
+3. total [] == "$0.00"
+4. total [Item (produtos !! 0) 2, Item (produtos !! 1) 3] == "$17.47"
+5. total [Item (Produto "X" 10.0) 0, Item (Produto "Y" 5.0) 0] == "$0.00"
+
+=== Testes para notaFiscal ===
+1. notaFiscal [Item (Produto "AMENDOIM" 3.99) 5] (contém "AMENDOIM...... $3.99 x 5 =   $19.95")
+2. notaFiscal [] (contém "TOTAL: $0.00")
+3. notaFiscal [Item (produtos !! 0) 1, Item (produtos !! 1) 1] (contém "AGUA MINERAL...... $2.50 x 1 =    $2.50")
+4. notaFiscal [Item (Produto "TESTE" 10.0) 10] (contém "TESTE...... $10.00 x 10 =   $100.00")
+5. notaFiscal (take 3 [Item p 1 | p <- produtos]) (contém "LEITE...... $2.99 x 1 =    $2.99")
+
+=== Testes para prodItem ===
+1. length prodItem == 10
+2. quantidadeItem (prodItem !! 0) == 1
+3. quantidadeItem (prodItem !! 9) == 10
+4. produtoItem (prodItem !! 2) == produtos !! 2
+5. sum [quantidadeItem i | i <- prodItem] == 55
+
+=== Testes para prodItemX ===
+1. prodItemX [1,2,3] == [Item (produtos !! 0) 1, Item (produtos !! 1) 2, Item (produtos !! 2) 3]
+2. prodItemX [] == []
+3. prodItemX [10] == [Item (produtos !! 0) 10]
+4. length (prodItemX [1..10]) == 10
+5. quantidadeItem (head (prodItemX [100])) == 100
+
+=== Testes para itensN ===
+1. itensN [("LEITE", 2)] == [Item (Produto "LEITE" 2.99) 2]
+2. itensN [] == []
+3. itensN [("INEXISTENTE", 1)] == []
+4. length (itensN [("AGUA MINERAL", 1), ("CAFE", 2)]) == 2
+5. itensN [("BISCOITO", 0)] == [Item (Produto "BISCOITO" 3.25) 0]
+
+=== Testes para itensI ===
+1. itensI [(0, 1)] == [Item (produtos !! 0) 1]
+2. itensI [] == []
+3. itensI [(99, 1)] == []
+4. length (itensI [(1, 1), (2, 2)]) == 2
+5. itensI [(9, 0)] == [Item (produtos !! 9) 0]
+
+=== Testes para venda ===
+1. venda [Item (Produto "TESTE" 10.0) 1] (imprime nota fiscal com TOTAL: $10.00)
+2. venda [] (imprime nota fiscal com TOTAL: $0.00)
+3. venda (itensI [(0, 2), (1, 3)]) (imprime AGUA MINERAL e CHOCOLATE)
+4. venda (itensN [("LEITE", 5)]) (imprime LEITE...... $2.99 x 5 =   $14.95)
+5. venda (prodItemX [1,2]) (imprime os 2 primeiros produtos com quantidades 1 e 2)
